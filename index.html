@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Kod </title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="header">
+    <p class="brand">QR<span>.</span>oluştur</p>
+    <p class="tag">Link → Kod</p>
+  </div>
+
+  <div class="body">
+    <label for="url-input">Dönüştürülecek link</label>
+    <div class="input-row">
+      <input type="text" id="url-input" placeholder="https://ornek.com" autocomplete="off">
+      <button class="make-btn" id="make-btn">Oluştur</button>
+    </div>
+    <p class="error" id="error-msg">Lütfen geçerli bir link girin.</p>
+
+    <div class="options">
+      <div class="option-block">
+        <label for="dark-color">Kod rengi</label>
+        <div class="swatch-row">
+          <input type="color" id="dark-color" value="#111111">
+          <span class="swatch-hex" id="dark-hex">#111111</span>
+        </div>
+      </div>
+      <div class="option-block">
+        <label for="light-color">Arka plan rengi</label>
+        <div class="swatch-row">
+          <input type="color" id="light-color" value="#ffffff">
+          <span class="swatch-hex" id="light-hex">#FFFFFF</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="options" style="border-bottom:none; padding-bottom:0;">
+      <div class="option-block">
+        <label for="logo-file">Logo ekle (opsiyonel)</label>
+        <div class="logo-row">
+          <label class="logo-upload" for="logo-file">Görsel seç</label>
+          <input type="file" id="logo-file" accept="image/*">
+          <button class="logo-clear" id="logo-clear">Kaldır</button>
+        </div>
+        <p class="logo-name" id="logo-name"></p>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div id="qrcode"></div>
+      <p class="result-url" id="result-url"></p>
+      <button class="download-btn" id="download-btn">PNG olarak indir</button>
+    </div>
+  </div>
+
+  <div class="footer-note">Link yapıştır, rengi ve logonu seç, kodu oluştur, PNG olarak indir.</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
