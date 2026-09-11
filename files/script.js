@@ -8,6 +8,7 @@ const downloadBtn = document.getElementById('download-btn');
 
 const darkColorInput = document.getElementById('dark-color');
 const lightColorInput = document.getElementById('light-color');
+
 const darkHex = document.getElementById('dark-hex');
 const lightHex = document.getElementById('light-hex');
 
@@ -18,99 +19,222 @@ const logoClearBtn = document.getElementById('logo-clear');
 let logoImage = null;
 let lastUrl = null;
 
-function normalizeUrl(value){
+
+// ==========================================
+// URL DÜZENLEME
+// ==========================================
+
+function normalizeUrl(value) {
   const trimmed = value.trim();
-  if(!trimmed) return null;
-  if(/^https?:\/\//i.test(trimmed)) return trimmed;
+
+  if (!trimmed) return null;
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
   return 'https://' + trimmed;
 }
 
+
+// ==========================================
+// RENK SEÇİCİLER
+// ==========================================
+
 darkColorInput.addEventListener('input', () => {
   darkHex.textContent = darkColorInput.value.toUpperCase();
-  if(lastUrl) generate();
+
+  if (lastUrl) {
+    generate();
+  }
 });
+
+
 lightColorInput.addEventListener('input', () => {
   lightHex.textContent = lightColorInput.value.toUpperCase();
-  if(lastUrl) generate();
+
+  if (lastUrl) {
+    generate();
+  }
 });
+
+
+// ==========================================
+// LOGO YÜKLEME
+// ==========================================
 
 logoFileInput.addEventListener('change', () => {
   const file = logoFileInput.files[0];
-  if(!file) return;
+
+  if (!file) return;
+
   const reader = new FileReader();
+
   reader.onload = (e) => {
     const img = new Image();
+
     img.onload = () => {
       logoImage = img;
+
       logoName.textContent = file.name;
+
       logoClearBtn.classList.add('show');
-      if(lastUrl) generate();
+
+      if (lastUrl) {
+        generate();
+      }
     };
+
     img.src = e.target.result;
   };
+
   reader.readAsDataURL(file);
 });
 
+
+// ==========================================
+// LOGO KALDIR
+// ==========================================
+
 logoClearBtn.addEventListener('click', () => {
   logoImage = null;
+
   logoFileInput.value = '';
+
   logoName.textContent = '';
+
   logoClearBtn.classList.remove('show');
-  if(lastUrl) generate();
+
+  if (lastUrl) {
+    generate();
+  }
 });
 
-function drawLogo(canvas){
-  if(!logoImage) return;
+
+// ==========================================
+// QR ÜZERİNE LOGO ÇİZ
+// ==========================================
+
+function drawLogo(canvas) {
+  if (!logoImage) return;
+
   const ctx = canvas.getContext('2d');
+
   const logoSize = canvas.width * 0.22;
+
   const x = (canvas.width - logoSize) / 2;
   const y = (canvas.height - logoSize) / 2;
+
   const pad = logoSize * 0.14;
 
+  // Logo arkasındaki beyaz alan
   ctx.fillStyle = lightColorInput.value;
-  ctx.fillRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2);
-  ctx.drawImage(logoImage, x, y, logoSize, logoSize);
+
+  ctx.fillRect(
+    x - pad,
+    y - pad,
+    logoSize + pad * 2,
+    logoSize + pad * 2
+  );
+
+  // Logo
+  ctx.drawImage(
+    logoImage,
+    x,
+    y,
+    logoSize,
+    logoSize
+  );
 }
 
-function generate(){
+
+// ==========================================
+// QR OLUŞTUR
+// ==========================================
+
+function generate() {
   const raw = input.value;
+
   const url = normalizeUrl(raw);
 
-  if(!url){
+  // Link yoksa hata göster
+  if (!url) {
     errorMsg.classList.add('show');
     result.classList.remove('show');
+
     return;
   }
+
   errorMsg.classList.remove('show');
+
   lastUrl = url;
 
+  // Önce eski QR'ı temizle
   qrContainer.innerHTML = '';
+
+  // QR oluştur
   new QRCode(qrContainer, {
     text: url,
+
     width: 240,
     height: 240,
+
     colorDark: darkColorInput.value,
     colorLight: lightColorInput.value,
-    correctLevel: logoImage ? QRCode.CorrectLevel.H : QRCode.CorrectLevel.M
+
+    correctLevel: logoImage
+      ? QRCode.CorrectLevel.H
+      : QRCode.CorrectLevel.M
   });
 
+  // QR canvas'ını bul
   const canvas = qrContainer.querySelector('canvas');
-  if(canvas) drawLogo(canvas);
 
+  // Logo varsa QR'ın üzerine yerleştir
+  if (canvas) {
+    drawLogo(canvas);
+  }
+
+  // URL'yi göster
   resultUrl.textContent = url;
+
+  // Sonuç alanını göster
   result.classList.add('show');
 }
 
+
+// ==========================================
+// BUTON
+// ==========================================
+
 makeBtn.addEventListener('click', generate);
+
+
+// ==========================================
+// ENTER İLE OLUŞTUR
+// ==========================================
+
 input.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') generate();
+  if (e.key === 'Enter') {
+    generate();
+  }
 });
+
+
+// ==========================================
+// PNG OLARAK İNDİR
+// ==========================================
 
 downloadBtn.addEventListener('click', () => {
   const canvas = qrContainer.querySelector('canvas');
-  if(!canvas) return;
+
+  if (!canvas) return;
+
   const link = document.createElement('a');
+
   link.download = 'qr-kod.png';
+
   link.href = canvas.toDataURL('image/png');
+
   link.click();
 });
